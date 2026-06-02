@@ -1,5 +1,10 @@
-import type { DataSourceSchema } from "@/lib/types/query";
-import type { QueryNode, QueryOperator, QueryRule } from "@/lib/types/query";
+import type {
+  DataSourceSchema,
+  QueryNode,
+  QueryOperator,
+  QueryRoot,
+  QueryRule,
+} from "@/lib/types/query";
 import { operatorNeedsValue } from "@/lib/engine/operators";
 
 function escapeSqlString(value: string): string {

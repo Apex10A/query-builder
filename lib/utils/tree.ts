@@ -67,6 +67,14 @@ export function updateNodeInTree(
   nodeId: string,
   updater: (node: QueryNode) => QueryNode
 ): QueryRoot {
+  if (nodeId === root.id) {
+    const updated = updater(root);
+    if (updated.type !== "group") {
+      throw new Error("Root node must remain a group");
+    }
+    return updated as QueryRoot;
+  }
+
   const next = cloneRoot(root);
 
   function walk(parent: QueryGroup | QueryRoot, children: QueryNode[]): void {
