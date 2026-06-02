@@ -26,7 +26,7 @@ export function WorkflowSidebar({
   const [tab, setTab] = useState<SidebarTab>(defaultTab);
 
   return (
-    <aside className="lantern-sidebar flex max-h-[45vh] w-full shrink-0 flex-col border-t lg:max-h-none lg:w-[var(--sidebar-width)] lg:border-t-0">
+    <aside className="lantern-sidebar flex max-h-[45vh] w-full shrink-0 flex-col border-[var(--border)] border-t bg-[var(--bg-sidebar)] shadow-[-4px_0_24px_rgba(17,24,39,0.04)] lg:max-h-none lg:w-[380px] lg:border-l lg:border-t-0">
       <div className="flex border-b border-[var(--border)]">
         {TABS.map((t) => (
           <button

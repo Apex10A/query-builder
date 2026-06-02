@@ -32,7 +32,7 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${jakarta.variable} ${jetbrains.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col bg-[var(--bg-app)] font-sans text-[var(--fg)] antialiased">
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>

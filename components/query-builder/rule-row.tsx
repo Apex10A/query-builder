@@ -92,8 +92,8 @@ function RuleRowComponent({ rule, schema, onRemove, index }: RuleRowProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.04, duration: 0.25 }}
       className={cn(
-        "workflow-card group relative p-4",
-        isDragging && "workflow-card-dragging z-20",
+        "workflow-card group relative rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-[var(--shadow-card)] transition-all hover:border-indigo-200 hover:shadow-[var(--shadow-card-hover)]",
+        isDragging && "workflow-card-dragging z-20 scale-[1.01] border-indigo-400 shadow-lg",
         hasError && "border-[var(--danger)]"
       )}
       data-testid={`rule-${rule.id}`}
