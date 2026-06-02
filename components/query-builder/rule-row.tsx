@@ -92,7 +92,7 @@ function RuleRowComponent({ rule, schema, onRemove, index }: RuleRowProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.04, duration: 0.25 }}
       className={cn(
-        "workflow-card group relative rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-[var(--shadow-card)] transition-all hover:border-indigo-200 hover:shadow-[var(--shadow-card-hover)]",
+        "workflow-card group relative min-w-0 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-[var(--shadow-card)] transition-all hover:border-indigo-200 hover:shadow-[var(--shadow-card-hover)]",
         isDragging && "workflow-card-dragging z-20 scale-[1.01] border-indigo-400 shadow-lg",
         hasError && "border-[var(--danger)]"
       )}
@@ -148,49 +148,53 @@ function RuleRowComponent({ rule, schema, onRemove, index }: RuleRowProps) {
         </motion.button>
       </div>
 
-      <div className="grid gap-2 sm:grid-cols-3">
-        <select
-          className="lantern-select"
-          value={rule.field}
-          onChange={(e) => updateRule({ field: e.target.value })}
-          aria-label="Field"
-        >
-          <option value="">Select field…</option>
-          {schema.fields.map((f) => (
-            <option key={f.name} value={f.name}>
-              {f.label ?? f.name}
-            </option>
-          ))}
-        </select>
+      <div className="flex min-w-0 flex-col gap-2">
+        <div className="grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2">
+          <select
+            className="lantern-select min-w-0"
+            value={rule.field}
+            onChange={(e) => updateRule({ field: e.target.value })}
+            aria-label="Field"
+          >
+            <option value="">Select field…</option>
+            {schema.fields.map((f) => (
+              <option key={f.name} value={f.name}>
+                {f.label ?? f.name}
+              </option>
+            ))}
+          </select>
 
-        <select
-          className="lantern-select"
-          value={rule.operator}
-          onChange={(e) =>
-            updateRule({
-              operator: e.target.value as QueryRule["operator"],
-              value: "",
-              valueTo: undefined,
-            })
-          }
-          aria-label="Operator"
-        >
-          {operators.map((op) => (
-            <option key={op} value={op}>
-              {OPERATOR_LABELS[op]}
-            </option>
-          ))}
-        </select>
+          <select
+            className="lantern-select min-w-0"
+            value={rule.operator}
+            onChange={(e) =>
+              updateRule({
+                operator: e.target.value as QueryRule["operator"],
+                value: "",
+                valueTo: undefined,
+              })
+            }
+            aria-label="Operator"
+          >
+            {operators.map((op) => (
+              <option key={op} value={op}>
+                {OPERATOR_LABELS[op]}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <ValueInput
-          field={fieldMeta}
-          operator={rule.operator}
-          value={rule.value}
-          valueTo={rule.valueTo}
-          onChange={(v) => updateRule({ value: v })}
-          onChangeTo={(v) => updateRule({ valueTo: v })}
-          hasError={hasError}
-        />
+        <div className="min-w-0 w-full overflow-hidden">
+          <ValueInput
+            field={fieldMeta}
+            operator={rule.operator}
+            value={rule.value}
+            valueTo={rule.valueTo}
+            onChange={(v) => updateRule({ value: v })}
+            onChangeTo={(v) => updateRule({ valueTo: v })}
+            hasError={hasError}
+          />
+        </div>
       </div>
 
       {issues.length > 0 && (
