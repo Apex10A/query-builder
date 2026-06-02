@@ -1,0 +1,121 @@
+export type MockRecord = Record<string, unknown>;
+
+export const MOCK_USERS: MockRecord[] = [
+  {
+    id: 1,
+    name: "Ada Lovelace",
+    email: "ada@example.com",
+    age: 36,
+    status: "active",
+    country: "UK",
+    purchases: 12,
+    createdAt: "2024-01-15",
+    verified: true,
+  },
+  {
+    id: 2,
+    name: "Grace Hopper",
+    email: "grace@example.com",
+    age: 45,
+    status: "active",
+    country: "USA",
+    purchases: 28,
+    createdAt: "2023-11-02",
+    verified: true,
+  },
+  {
+    id: 3,
+    name: "Katherine Johnson",
+    email: "katherine@example.com",
+    age: 22,
+    status: "pending",
+    country: "Nigeria",
+    purchases: 3,
+    createdAt: "2025-03-10",
+    verified: false,
+  },
+  {
+    id: 4,
+    name: "Alan Turing",
+    email: "alan@example.com",
+    age: 41,
+    status: "inactive",
+    country: "UK",
+    purchases: 7,
+    createdAt: "2022-08-20",
+    verified: true,
+  },
+  {
+    id: 5,
+    name: "Margaret Hamilton",
+    email: "margaret@example.com",
+    age: 19,
+    status: "active",
+    country: "Nigeria",
+    purchases: 15,
+    createdAt: "2025-01-05",
+    verified: true,
+  },
+  {
+    id: 6,
+    name: "Tim Berners-Lee",
+    email: "tim@example.com",
+    age: 68,
+    status: "active",
+    country: "UK",
+    purchases: 42,
+    createdAt: "2021-06-18",
+    verified: true,
+  },
+  {
+    id: 7,
+    name: "Linus Torvalds",
+    email: "linus@example.com",
+    age: 54,
+    status: "inactive",
+    country: "Finland",
+    purchases: 2,
+    createdAt: "2020-12-01",
+    verified: false,
+  },
+  {
+    id: 8,
+    name: "Radia Perlman",
+    email: "radia@example.com",
+    age: 17,
+    status: "active",
+    country: "USA",
+    purchases: 11,
+    createdAt: "2025-06-01",
+    verified: true,
+  },
+];
+
+export const MOCK_ORDERS: MockRecord[] = [
+  {
+    id: 1,
+    orderId: "ORD-1001",
+    amount: 249.99,
+    status: "delivered",
+    createdAt: "2025-02-14",
+  },
+  {
+    id: 2,
+    orderId: "ORD-1002",
+    amount: 89.5,
+    status: "pending",
+    createdAt: "2025-05-20",
+  },
+  {
+    id: 3,
+    orderId: "ORD-1003",
+    amount: 1200,
+    status: "shipped",
+    createdAt: "2025-04-01",
+  },
+];
+
+export function getDatasetForSchema(schemaId: string): MockRecord[] {
+  if (schemaId === "orders") return MOCK_ORDERS;
+  return MOCK_USERS;
+}
