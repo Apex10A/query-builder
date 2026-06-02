@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useCallback, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   DndContext,
   closestCenter,
@@ -26,7 +27,6 @@ import {
   updateNodeInTree,
 } from "@/lib/utils/tree";
 import { RuleRow } from "./rule-row";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils/cn";
 import { getIssuesForNode } from "@/lib/engine/validation";
 
@@ -51,7 +51,7 @@ function ConditionGroupComponent({
   const childIds = useMemo(() => group.children.map((c) => c.id), [group.children]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
@@ -108,96 +108,118 @@ function ConditionGroupComponent({
 
   return (
     <div
-      className={cn(
-        "rounded-xl transition-all duration-200",
-        !isRoot && "border border-dashed border-violet-300/60 dark:border-violet-700/50 bg-violet-50/30 dark:bg-violet-950/20 p-3",
-        depth > 0 && "ml-2 sm:ml-4"
-      )}
+      className={cn(!isRoot && "workflow-nest", depth > 0 && "ml-4")}
       data-testid={`group-${group.id}`}
-      style={{ marginLeft: isRoot ? 0 : Math.min(depth * 8, 32) }}
     >
-      <div className="mb-3 flex flex-wrap items-center gap-2">
+      <div className="mb-4 flex flex-wrap items-center gap-2">
         {!isRoot && (
-          <button
+          <motion.button
+            whileTap={{ scale: 0.95 }}
             type="button"
             onClick={toggleCollapsed}
-            className="text-sm text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+            className="flex h-7 w-7 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--bg-card)] text-xs text-[var(--fg-muted)]"
             aria-expanded={!collapsed}
           >
             {collapsed ? "▶" : "▼"}
-          </button>
+          </motion.button>
         )}
-        <span className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-          {isRoot ? "Root" : "Group"}
-        </span>
-        <button
+        {!isRoot && (
+          <span className="text-xs font-semibold text-[var(--fg-muted)]">
+            Nested group
+          </span>
+        )}
+        <motion.button
+          whileTap={{ scale: 0.94 }}
           type="button"
           onClick={toggleLogic}
           className={cn(
-            "rounded-full px-3 py-1 text-xs font-bold transition-colors duration-150",
-            group.logic === "and"
-              ? "bg-violet-600 text-white"
-              : "bg-amber-500 text-white"
+            "logic-chip",
+            group.logic === "and" ? "logic-chip-and" : "logic-chip-or"
           )}
         >
           {group.logic.toUpperCase()}
-        </button>
+        </motion.button>
         {!isRoot && (
-          <Button
-            variant="ghost"
-            size="sm"
+          <button
+            type="button"
             onClick={() => removeChild(group.id)}
-            aria-label="Remove group"
+            className="ml-auto text-xs text-[var(--fg-muted)] hover:text-[var(--danger)]"
           >
-            Remove group
-          </Button>
+            Remove
+          </button>
         )}
       </div>
 
-      {!collapsed && (
-        <>
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={onDragEnd}
+      <AnimatePresence>
+        {!collapsed && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25 }}
           >
-            <SortableContext items={childIds} strategy={verticalListSortingStrategy}>
-              <div className="flex flex-col gap-2">
-                {group.children.map((child) =>
-                  child.type === "rule" ? (
-                    <RuleRow
-                      key={child.id}
-                      rule={child}
-                      schema={schema}
-                      onRemove={() => removeChild(child.id)}
-                    />
-                  ) : (
-                    <ConditionGroup
-                      key={child.id}
-                      group={child}
-                      schema={schema}
-                      depth={depth + 1}
-                    />
-                  )
-                )}
-              </div>
-            </SortableContext>
-          </DndContext>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={onDragEnd}
+            >
+              <SortableContext
+                items={childIds}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="flex flex-col gap-0">
+                  {group.children.map((child, index) => (
+                    <div key={child.id}>
+                      {index > 0 && <div className="workflow-connector" />}
+                      {child.type === "rule" ? (
+                        <RuleRow
+                          rule={child}
+                          schema={schema}
+                          onRemove={() => removeChild(child.id)}
+                          index={index}
+                        />
+                      ) : (
+                        <ConditionGroup
+                          group={child}
+                          schema={schema}
+                          depth={depth + 1}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
 
-          {issues.length > 0 && (
-            <p className="mt-2 text-xs text-red-600">{issues[0]?.message}</p>
-          )}
+            {issues.length > 0 && (
+              <p className="mt-2 text-xs text-[var(--danger)]">
+                {issues[0]?.message}
+              </p>
+            )}
 
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Button size="sm" variant="secondary" onClick={addRule}>
-              + Rule
-            </Button>
-            <Button size="sm" variant="secondary" onClick={addGroup}>
-              + Nested group
-            </Button>
-          </div>
-        </>
-      )}
+            <div className="mt-4 flex flex-wrap gap-2">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                type="button"
+                onClick={addRule}
+                className="lantern-btn-secondary rounded-lg px-4 py-2 text-xs font-semibold"
+              >
+                + Add condition
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                type="button"
+                onClick={addGroup}
+                className="lantern-btn-secondary rounded-lg px-4 py-2 text-xs font-semibold"
+              >
+                + Add group
+              </motion.button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

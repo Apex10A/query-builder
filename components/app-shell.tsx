@@ -1,33 +1,53 @@
 "use client";
 
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
-import { AppToolbar } from "@/components/toolbar/app-toolbar";
+import { WorkflowTopNav, type MainTab } from "@/components/layout/workflow-top-nav";
+import { WorkflowSidebar } from "@/components/layout/workflow-sidebar";
+import { ActivityPanel } from "@/components/layout/activity-panel";
 import { QueryBuilderPanel } from "@/components/query-builder/query-builder-panel";
-import { QueryPreview } from "@/components/preview/query-preview";
-import { ResultsPanel } from "@/components/results/results-panel";
+import { useQueryStore } from "@/lib/store/query-store";
 
 export function AppShell() {
   useKeyboardShortcuts();
+  const [mainTab, setMainTab] = useState<MainTab>("builder");
+  const lastResultCount = useQueryStore((s) => s.lastResultCount);
 
   return (
-    <div className="flex min-h-full flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-      <AppToolbar />
-      <main className="mx-auto grid w-full max-w-7xl flex-1 gap-6 p-4 lg:grid-cols-2 lg:p-6">
-        <div className="flex flex-col gap-6 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 lg:p-6">
-          <QueryBuilderPanel />
-        </div>
-        <div className="flex flex-col gap-6">
-          <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 lg:p-6">
-            <QueryPreview />
-          </div>
-          <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 lg:p-6">
-            <ResultsPanel />
-          </div>
-        </div>
-      </main>
-      <footer className="border-t border-zinc-200 px-4 py-3 text-center text-xs text-zinc-500 dark:border-zinc-800">
-        Shortcuts: Ctrl+S snapshot · Ctrl+E copy export · Ctrl+Shift+R reset
-      </footer>
+    <div className="lantern-app flex h-dvh flex-col overflow-hidden">
+      <WorkflowTopNav activeTab={mainTab} onTabChange={setMainTab} />
+
+      <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+        <main className="lantern-canvas min-h-0 min-w-0 flex-1 overflow-y-auto">
+          <AnimatePresence mode="wait">
+            {mainTab === "builder" ? (
+              <motion.div
+                key="builder"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="p-6 lg:p-10"
+              >
+                <QueryBuilderPanel />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="activity"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="p-6 lg:p-10"
+              >
+                <ActivityPanel />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </main>
+
+        <WorkflowSidebar resultsCount={lastResultCount} />
+      </div>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import { useQueryStore } from "@/lib/store/query-store";
 import { createInitialRoot } from "@/lib/utils/tree";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils/cn";
 
 export function AppToolbar() {
   const theme = useQueryStore((s) => s.theme);
@@ -62,20 +63,35 @@ export function AppToolbar() {
     setPresetName("");
   }, [presetName, presets.length, savePreset]);
 
+  const selectClass = "qb-select h-8 max-w-[140px] text-xs";
+
   return (
-    <header className="sticky top-0 z-20 border-b border-zinc-200 bg-white/90 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/90">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-4 py-3">
-        <h1 className="mr-auto text-base font-bold tracking-tight sm:text-lg">
-          Visual Query Builder
-        </h1>
+    <header className="sticky top-0 z-20 border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--bg-elevated)_85%,transparent)] backdrop-blur-xl">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-4 py-3 lg:px-8">
+        <div className="mr-auto flex items-center gap-3">
+          <div
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--bg-muted)] font-mono text-sm font-bold text-[var(--accent)]"
+            aria-hidden
+          >
+            Q
+          </div>
+          <div>
+            <h1 className="font-display text-lg font-bold tracking-tight sm:text-xl">
+              Query Atelier
+            </h1>
+            <p className="hidden text-[0.65rem] tracking-wide text-[var(--fg-subtle)] sm:block">
+              Visual filter composer
+            </p>
+          </div>
+        </div>
 
         <Button size="sm" variant="secondary" onClick={() => pushHistory()}>
-          Save snapshot
+          Snapshot
         </Button>
 
         {history.length > 0 && (
           <select
-            className="h-8 max-w-[140px] rounded-lg border border-zinc-300 bg-white px-2 text-xs dark:border-zinc-600 dark:bg-zinc-900"
+            className={selectClass}
             defaultValue=""
             onChange={(e) => {
               if (e.target.value) restoreHistory(e.target.value);
@@ -97,15 +113,15 @@ export function AppToolbar() {
           placeholder="Preset name"
           value={presetName}
           onChange={(e) => setPresetName(e.target.value)}
-          className="h-8 w-24 rounded-lg border border-zinc-300 px-2 text-xs dark:border-zinc-600 dark:bg-zinc-900 sm:w-32"
+          className="qb-input h-8 w-28 text-xs sm:w-32"
         />
         <Button size="sm" variant="secondary" onClick={handleSavePreset}>
-          Save preset
+          Save
         </Button>
 
         {presets.length > 0 && (
           <select
-            className="h-8 max-w-[120px] rounded-lg border border-zinc-300 bg-white px-2 text-xs dark:border-zinc-600 dark:bg-zinc-900"
+            className={cn(selectClass, "max-w-[120px]")}
             defaultValue=""
             onChange={(e) => {
               if (e.target.value) loadPreset(e.target.value);
@@ -131,7 +147,7 @@ export function AppToolbar() {
             }}
             title="Delete last preset"
           >
-            Del preset
+            Del
           </Button>
         )}
 
@@ -166,12 +182,18 @@ export function AppToolbar() {
           Reset
         </Button>
 
-        <Button size="sm" variant="ghost" onClick={cycleTheme} title="Toggle theme">
-          {theme === "dark" ? "🌙" : theme === "light" ? "☀️" : "◐"}
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={cycleTheme}
+          title="Toggle theme"
+          className="font-mono text-base"
+        >
+          {theme === "dark" ? "◐" : theme === "light" ? "○" : "◎"}
         </Button>
       </div>
       {importError && (
-        <p className="px-4 pb-2 text-xs text-red-600">{importError}</p>
+        <p className="px-6 pb-2 text-xs text-[var(--danger)]">{importError}</p>
       )}
     </header>
   );

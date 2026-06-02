@@ -1,25 +1,338 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fafafa;
-  --foreground: #18181b;
+  --bg-app: #f4f5f7;
+  --bg-canvas: #f8f9fb;
+  --bg-card: #ffffff;
+  --bg-sidebar: #ffffff;
+  --bg-muted: #eef0f4;
+  --fg: #111827;
+  --fg-muted: #6b7280;
+  --fg-subtle: #9ca3af;
+  --border: #e5e7eb;
+  --border-soft: #f0f1f4;
+  --accent: #4f46e5;
+  --accent-soft: #eef2ff;
+  --accent-hover: #4338ca;
+  --accent-glow: rgba(79, 70, 229, 0.12);
+  --warm: #f59e0b;
+  --warm-soft: #fffbeb;
+  --success: #10b981;
+  --success-soft: #ecfdf5;
+  --warning: #f59e0b;
+  --warning-soft: #fffbeb;
+  --danger: #ef4444;
+  --danger-soft: #fef2f2;
+  --code-bg: #1e293b;
+  --code-fg: #a5b4fc;
+  --shadow-card: 0 1px 2px rgba(17, 24, 39, 0.04),
+    0 4px 16px rgba(17, 24, 39, 0.06);
+  --shadow-card-hover: 0 4px 6px rgba(17, 24, 39, 0.05),
+    0 12px 32px rgba(17, 24, 39, 0.1);
+  --shadow-nav: 0 1px 0 var(--border);
+  --radius-sm: 0.5rem;
+  --radius: 0.75rem;
+  --radius-lg: 1rem;
+  --sidebar-width: 380px;
 }
 
 .dark {
-  --background: #09090b;
-  --foreground: #fafafa;
+  --bg-app: #0f1117;
+  --bg-canvas: #13151c;
+  --bg-card: #1a1d27;
+  --bg-sidebar: #1a1d27;
+  --bg-muted: #232733;
+  --fg: #f3f4f6;
+  --fg-muted: #9ca3af;
+  --fg-subtle: #6b7280;
+  --border: #2d3348;
+  --border-soft: #232733;
+  --accent: #818cf8;
+  --accent-soft: #1e1b4b;
+  --accent-hover: #a5b4fc;
+  --accent-glow: rgba(129, 140, 248, 0.15);
+  --code-bg: #0c0e14;
+  --code-fg: #c7d2fe;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.2),
+    0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-card-hover: 0 8px 32px rgba(0, 0, 0, 0.45);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--bg-app);
+  --color-foreground: var(--fg);
+  --font-sans: var(--font-jakarta);
+  --font-mono: var(--font-mono-jb);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--bg-app);
+  color: var(--fg);
+  font-family: var(--font-jakarta), system-ui, sans-serif;
+}
+
+/* App shell */
+.lantern-app {
+  background: var(--bg-app);
+  min-height: 100dvh;
+}
+
+/* Dot-grid canvas (reference style) */
+.lantern-canvas {
+  background-color: var(--bg-canvas);
+  background-image: radial-gradient(
+    circle,
+    var(--border) 1px,
+    transparent 1px
+  );
+  background-size: 20px 20px;
+}
+
+/* Top nav */
+.lantern-nav {
+  background: var(--bg-card);
+  box-shadow: var(--shadow-nav);
+  border-bottom: 1px solid var(--border);
+}
+
+.lantern-nav-tab {
+  position: relative;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--fg-muted);
+  transition: color 0.2s;
+}
+
+.lantern-nav-tab:hover {
+  color: var(--fg);
+}
+
+.lantern-nav-tab[data-active="true"] {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.lantern-nav-tab[data-active="true"]::after {
+  content: "";
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: -1px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 2px 2px 0 0;
+}
+
+/* Sidebar */
+.lantern-sidebar {
+  width: var(--sidebar-width);
+  background: var(--bg-sidebar);
+  border-left: 1px solid var(--border);
+  box-shadow: -4px 0 24px rgba(17, 24, 39, 0.04);
+}
+
+.lantern-sidebar-tab {
+  flex: 1;
+  padding: 0.75rem 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--fg-muted);
+  text-align: center;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.lantern-sidebar-tab:hover {
+  color: var(--fg);
+  background: var(--bg-muted);
+}
+
+.lantern-sidebar-tab[data-active="true"] {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* Workflow cards */
+.workflow-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.2s;
+}
+
+.workflow-card:hover {
+  box-shadow: var(--shadow-card-hover);
+  border-color: color-mix(in srgb, var(--accent) 25%, var(--border));
+}
+
+.workflow-card-dragging {
+  box-shadow: var(--shadow-card-hover);
+  transform: scale(1.01);
+  border-color: var(--accent);
+}
+
+.workflow-nest {
+  background: color-mix(in srgb, var(--bg-card) 60%, var(--bg-canvas));
+  border: 1px dashed color-mix(in srgb, var(--accent) 30%, var(--border));
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+}
+
+/* Connector between rules */
+.workflow-connector {
+  display: flex;
+  justify-content: center;
+  height: 1.25rem;
+  position: relative;
+}
+
+.workflow-connector::before {
+  content: "";
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(to bottom, var(--border), var(--accent));
+  border-radius: 1px;
+}
+
+.workflow-connector::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid var(--accent);
+}
+
+/* Status badges */
+.status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+.status-dot-success {
+  background: var(--success);
+  box-shadow: 0 0 0 3px var(--success-soft);
+}
+
+.status-dot-warning {
+  background: var(--warning);
+  box-shadow: 0 0 0 3px var(--warning-soft);
+}
+
+.status-dot-error {
+  background: var(--danger);
+  box-shadow: 0 0 0 3px var(--danger-soft);
+}
+
+/* Logic chips */
+.logic-chip {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  transition: transform 0.15s;
+}
+
+.logic-chip:active {
+  transform: scale(0.96);
+}
+
+.logic-chip-and {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.logic-chip-or {
+  background: var(--warm-soft);
+  color: #b45309;
+  border: 1px solid color-mix(in srgb, var(--warm) 30%, transparent);
+}
+
+/* Form controls */
+.lantern-input,
+.lantern-select {
+  height: 2.25rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--fg);
+  font-size: 0.8125rem;
+  padding: 0 0.75rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.lantern-input:focus,
+.lantern-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.lantern-input-error {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 15%, transparent);
+}
+
+/* Detail rows (sidebar) */
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 0.8125rem;
+}
+
+.detail-row-label {
+  color: var(--fg-muted);
+}
+
+.detail-row-value {
+  font-weight: 500;
+  color: var(--fg);
+  text-align: right;
+}
+
+/* Code block */
+.lantern-code {
+  background: var(--code-bg);
+  color: var(--code-fg);
+  border-radius: var(--radius);
+  font-family: var(--font-mono-jb), ui-monospace, monospace;
+  font-size: 0.75rem;
+  line-height: 1.6;
+}
+
+/* Buttons */
+.lantern-btn-primary {
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(79, 70, 229, 0.3);
+}
+
+.lantern-btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+.lantern-btn-secondary {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--fg);
+}
+
+.lantern-btn-secondary:hover {
+  background: var(--bg-muted);
+  border-color: var(--border);
 }
 
 @media (prefers-reduced-motion: reduce) {

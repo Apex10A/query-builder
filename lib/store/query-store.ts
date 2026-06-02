@@ -61,7 +61,7 @@ export const useQueryStore = create<QueryState>()(
       validationIssues: [],
       history: [],
       presets: [],
-      theme: "system",
+      theme: "light",
       isExecuting: false,
       lastResultCount: null,
 

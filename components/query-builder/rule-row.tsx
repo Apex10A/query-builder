@@ -3,6 +3,7 @@
 import { memo, useCallback, useMemo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { motion } from "framer-motion";
 import type { QueryRule } from "@/lib/types/query";
 import type { DataSourceSchema } from "@/lib/types/query";
 import {
@@ -13,16 +14,16 @@ import { getIssuesForNode } from "@/lib/engine/validation";
 import { useQueryStore } from "@/lib/store/query-store";
 import { updateNodeInTree } from "@/lib/utils/tree";
 import { ValueInput } from "./value-input";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils/cn";
 
 interface RuleRowProps {
   rule: QueryRule;
   schema: DataSourceSchema;
   onRemove: () => void;
+  index: number;
 }
 
-function RuleRowComponent({ rule, schema, onRemove }: RuleRowProps) {
+function RuleRowComponent({ rule, schema, onRemove, index }: RuleRowProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: rule.id });
 
@@ -45,6 +46,10 @@ function RuleRowComponent({ rule, schema, onRemove }: RuleRowProps) {
 
   const issues = getIssuesForNode(validationIssues, rule.id);
   const hasError = issues.some((i) => i.severity === "error");
+  const isComplete =
+    rule.field && !hasError && (rule.operator === "is_null" || rule.operator === "is_not_null" || rule.value !== "");
+
+  const status = hasError ? "error" : isComplete ? "success" : "warning";
 
   const updateRule = useCallback(
     (patch: Partial<QueryRule>) => {
@@ -73,37 +78,84 @@ function RuleRowComponent({ rule, schema, onRemove }: RuleRowProps) {
     transition,
   };
 
+  const title =
+    rule.field && fieldMeta
+      ? `${fieldMeta.label ?? rule.field} ${OPERATOR_LABELS[rule.operator]?.toLowerCase() ?? rule.operator}`
+      : "New condition";
+
   return (
-    <div
+    <motion.div
       ref={setNodeRef}
       style={style}
+      layout
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.04, duration: 0.25 }}
       className={cn(
-        "group flex flex-wrap items-start gap-2 rounded-xl border bg-white/80 p-3 shadow-sm transition-all duration-200 dark:bg-zinc-900/80",
-        isDragging && "opacity-60 ring-2 ring-violet-400 z-10",
-        hasError
-          ? "border-red-300 dark:border-red-800"
-          : "border-zinc-200 dark:border-zinc-700"
+        "workflow-card group relative p-4",
+        isDragging && "workflow-card-dragging z-20",
+        hasError && "border-[var(--danger)]"
       )}
       data-testid={`rule-${rule.id}`}
     >
-      <button
-        type="button"
-        className="mt-2 cursor-grab text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 touch-none"
-        aria-label="Drag to reorder"
-        {...attributes}
-        {...listeners}
-      >
-        ⋮⋮
-      </button>
+      <div className="mb-3 flex items-start gap-3">
+        <button
+          type="button"
+          className="mt-1 cursor-grab touch-none text-[var(--fg-subtle)] hover:text-[var(--accent)]"
+          aria-label="Drag to reorder"
+          {...attributes}
+          {...listeners}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <circle cx="5" cy="4" r="1.2" />
+            <circle cx="11" cy="4" r="1.2" />
+            <circle cx="5" cy="8" r="1.2" />
+            <circle cx="11" cy="8" r="1.2" />
+            <circle cx="5" cy="12" r="1.2" />
+            <circle cx="11" cy="12" r="1.2" />
+          </svg>
+        </button>
 
-      <div className="flex flex-1 flex-wrap gap-2 min-w-0">
+        <span
+          className={cn(
+            "status-dot mt-1.5",
+            status === "success" && "status-dot-success",
+            status === "warning" && "status-dot-warning",
+            status === "error" && "status-dot-error"
+          )}
+        />
+
+        <div className="min-w-0 flex-1">
+          <p className="font-semibold text-[var(--fg)]">{title}</p>
+          <p className="text-xs text-[var(--fg-muted)]">
+            {status === "success"
+              ? "Complete"
+              : status === "error"
+                ? "Needs attention"
+                : "In progress"}
+          </p>
+        </div>
+
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          type="button"
+          onClick={onRemove}
+          className="rounded-lg p-1.5 text-[var(--fg-subtle)] hover:bg-[var(--danger-soft)] hover:text-[var(--danger)]"
+          aria-label="Remove rule"
+        >
+          ✕
+        </motion.button>
+      </div>
+
+      <div className="grid gap-2 sm:grid-cols-3">
         <select
-          className="h-9 min-w-[120px] flex-1 rounded-lg border border-zinc-300 bg-white px-2 text-sm dark:border-zinc-600 dark:bg-zinc-900"
+          className="lantern-select"
           value={rule.field}
           onChange={(e) => updateRule({ field: e.target.value })}
           aria-label="Field"
         >
-          <option value="">Field…</option>
+          <option value="">Select field…</option>
           {schema.fields.map((f) => (
             <option key={f.name} value={f.name}>
               {f.label ?? f.name}
@@ -112,7 +164,7 @@ function RuleRowComponent({ rule, schema, onRemove }: RuleRowProps) {
         </select>
 
         <select
-          className="h-9 min-w-[130px] flex-1 rounded-lg border border-zinc-300 bg-white px-2 text-sm dark:border-zinc-600 dark:bg-zinc-900"
+          className="lantern-select"
           value={rule.operator}
           onChange={(e) =>
             updateRule({
@@ -130,37 +182,25 @@ function RuleRowComponent({ rule, schema, onRemove }: RuleRowProps) {
           ))}
         </select>
 
-        <div className="min-w-[140px] flex-[2]">
-          <ValueInput
-            field={fieldMeta}
-            operator={rule.operator}
-            value={rule.value}
-            valueTo={rule.valueTo}
-            onChange={(v) => updateRule({ value: v })}
-            onChangeTo={(v) => updateRule({ valueTo: v })}
-            hasError={hasError}
-          />
-        </div>
+        <ValueInput
+          field={fieldMeta}
+          operator={rule.operator}
+          value={rule.value}
+          valueTo={rule.valueTo}
+          onChange={(v) => updateRule({ value: v })}
+          onChangeTo={(v) => updateRule({ valueTo: v })}
+          hasError={hasError}
+        />
       </div>
 
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={onRemove}
-        aria-label="Remove rule"
-        className="shrink-0"
-      >
-        ✕
-      </Button>
-
       {issues.length > 0 && (
-        <ul className="w-full text-xs text-red-600 dark:text-red-400">
+        <ul className="mt-2 text-xs text-[var(--danger)]">
           {issues.map((i, idx) => (
             <li key={idx}>{i.message}</li>
           ))}
         </ul>
       )}
-    </div>
+    </motion.div>
   );
 }
 

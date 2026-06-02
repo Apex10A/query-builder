@@ -1,16 +1,15 @@
 "use client";
 
 import { memo } from "react";
+import { motion } from "framer-motion";
 import { useQueryStore } from "@/lib/store/query-store";
 import { getSchemaById } from "@/lib/schema/sources";
 import { ConditionGroup } from "./condition-group";
-import { DATA_SOURCES } from "@/lib/schema/sources";
 import { countRules, maxDepth } from "@/lib/utils/tree";
 import { isQueryValid } from "@/lib/engine/validation";
 
 function QueryBuilderPanelComponent() {
   const schemaId = useQueryStore((s) => s.schemaId);
-  const setSchemaId = useQueryStore((s) => s.setSchemaId);
   const root = useQueryStore((s) => s.root);
   const validationIssues = useQueryStore((s) => s.validationIssues);
 
@@ -21,36 +20,33 @@ function QueryBuilderPanelComponent() {
   const errorCount = validationIssues.filter((i) => i.severity === "error").length;
 
   return (
-    <section className="flex flex-col gap-4" aria-label="Query builder">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-            Conditions
-          </h2>
-          <p className="text-sm text-zinc-500">
-            {countRules(root)} rules · depth {maxDepth(root)} ·{" "}
-            {valid ? (
-              <span className="text-emerald-600">Valid</span>
-            ) : (
-              <span className="text-red-600">{errorCount} errors</span>
-            )}
-          </p>
-        </div>
-        <label className="flex items-center gap-2 text-sm">
-          <span className="text-zinc-500">Data source</span>
-          <select
-            className="h-9 rounded-lg border border-zinc-300 bg-white px-3 dark:border-zinc-600 dark:bg-zinc-900"
-            value={schemaId}
-            onChange={(e) => setSchemaId(e.target.value)}
+    <section className="mx-auto max-w-3xl" aria-label="Query builder">
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-8"
+      >
+        <p className="text-xs font-semibold uppercase tracking-widest text-[var(--accent)]">
+          Workflow
+        </p>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight text-[var(--fg)]">
+          Build your query
+        </h1>
+        <p className="mt-2 flex flex-wrap items-center gap-2 text-sm text-[var(--fg-muted)]">
+          <span>
+            {countRules(root)} conditions · depth {maxDepth(root)}
+          </span>
+          <span
+            className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+              valid
+                ? "bg-[var(--success-soft)] text-[var(--success)]"
+                : "bg-[var(--danger-soft)] text-[var(--danger)]"
+            }`}
           >
-            {DATA_SOURCES.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
+            {valid ? "Ready" : `${errorCount} issues`}
+          </span>
+        </p>
+      </motion.div>
 
       <ConditionGroup group={root} schema={schema} isRoot depth={0} />
     </section>
