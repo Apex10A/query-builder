@@ -8,6 +8,7 @@ import { WorkflowSidebar } from "@/components/layout/workflow-sidebar";
 import { ActivityPanel } from "@/components/layout/activity-panel";
 import { QueryBuilderPanel } from "@/components/query-builder/query-builder-panel";
 import { useQueryStore } from "@/lib/store/query-store";
+import { ToastContainer } from "@/components/ui/toast-container";
 
 export function AppShell() {
   useKeyboardShortcuts();
@@ -40,7 +41,9 @@ export function AppShell() {
                 exit={{ opacity: 0 }}
                 className="p-6 lg:p-10"
               >
-                <ActivityPanel />
+                <ActivityPanel
+                  onRestored={() => setMainTab("builder")}
+                />
               </motion.div>
             )}
           </AnimatePresence>
@@ -48,6 +51,7 @@ export function AppShell() {
 
         <WorkflowSidebar resultsCount={lastResultCount} />
       </div>
+      <ToastContainer />
     </div>
   );
 }

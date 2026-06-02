@@ -50,22 +50,22 @@ function ValueInputComponent({
 
   if (operatorNeedsRange(operator)) {
     return (
-      <div className="flex items-center gap-2 w-full">
+      <div className="flex min-w-0 w-full flex-wrap items-center gap-2 sm:flex-nowrap">
         <FieldTypedInput
           field={field}
           operator={operator}
           value={value}
           onChange={onChange}
-          className={inputClass}
+          className={cn(inputClass, "min-w-0 flex-1")}
           placeholder="From"
         />
-        <span className="text-zinc-400 text-xs shrink-0">to</span>
+        <span className="shrink-0 text-xs text-[var(--fg-muted)]">to</span>
         <FieldTypedInput
           field={field}
           operator={operator}
           value={valueTo}
           onChange={onChangeTo ?? (() => {})}
-          className={inputClass}
+          className={cn(inputClass, "min-w-0 flex-1")}
           placeholder="To"
         />
       </div>
@@ -78,7 +78,7 @@ function ValueInputComponent({
         className={inputClass}
         value={String(value ?? "")}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="a, b, c (comma-separated)"
+        placeholder="ada, grace, alan (comma-separated)"
       />
     );
   }

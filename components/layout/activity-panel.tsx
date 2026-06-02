@@ -2,10 +2,22 @@
 
 import { motion } from "framer-motion";
 import { useQueryStore } from "@/lib/store/query-store";
+import { useToastStore } from "@/lib/store/toast-store";
 
-export function ActivityPanel() {
+interface ActivityPanelProps {
+  onRestored?: () => void;
+}
+
+export function ActivityPanel({ onRestored }: ActivityPanelProps) {
   const history = useQueryStore((s) => s.history);
   const restoreHistory = useQueryStore((s) => s.restoreHistory);
+  const addToast = useToastStore((s) => s.addToast);
+
+  const handleRestore = (id: string, label: string) => {
+    restoreHistory(id);
+    addToast(`Restored "${label}"`, "success");
+    onRestored?.();
+  };
 
   return (
     <motion.div
@@ -36,8 +48,8 @@ export function ActivityPanel() {
             >
               <button
                 type="button"
-                onClick={() => restoreHistory(entry.id)}
-                className="workflow-card flex w-full items-center justify-between gap-4 p-4 text-left transition-transform hover:scale-[1.01]"
+                onClick={() => handleRestore(entry.id, entry.label)}
+                className="workflow-card flex w-full cursor-pointer items-center justify-between gap-4 p-4 text-left transition-transform hover:scale-[1.01]"
               >
                 <div>
                   <p className="font-medium text-[var(--fg)]">{entry.label}</p>
@@ -46,7 +58,7 @@ export function ActivityPanel() {
                     {entry.schemaId}
                   </p>
                 </div>
-                <span className="text-xs font-medium text-[var(--accent)]">
+                <span className="cursor-pointer text-xs font-medium text-[var(--accent)] hover:underline">
                   Restore →
                 </span>
               </button>
