@@ -30,16 +30,13 @@ function ValueInputComponent({
 }: ValueInputProps) {
   if (!operatorNeedsValue(operator)) {
     return (
-      <span className="text-xs text-zinc-500 italic px-2">No value needed</span>
+      <span className="px-2 font-mono text-xs italic text-[var(--fg-subtle)]">
+        ∅ no value
+      </span>
     );
   }
 
-  const inputClass = cn(
-    "h-9 w-full rounded-lg border bg-white px-3 text-sm dark:bg-zinc-900 transition-colors",
-    hasError
-      ? "border-red-400 focus:ring-red-400"
-      : "border-zinc-300 dark:border-zinc-600 focus:ring-violet-400"
-  );
+  const inputClass = cn("lantern-input", hasError && "lantern-input-error");
 
   if (!field) {
     return (

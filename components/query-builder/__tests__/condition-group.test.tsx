@@ -10,7 +10,7 @@ describe("ConditionGroup", () => {
     const root = createInitialRoot();
     render(<ConditionGroup group={root} schema={schema} isRoot />);
     expect(screen.getByTestId(`group-${root.id}`)).toBeInTheDocument();
-    expect(screen.getByText(/\+ Rule/i)).toBeInTheDocument();
-    expect(screen.getByLabelText("Field")).toBeInTheDocument();
+    expect(screen.getByText(/\+ Add condition/i)).toBeInTheDocument();
+    expect(screen.getByLabelText("Field", { selector: "select" })).toBeInTheDocument();
   });
 });
