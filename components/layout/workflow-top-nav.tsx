@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { LanternLogo } from "@/components/brand/lantern-logo";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useQueryStore } from "@/lib/store/query-store";
 
 export type MainTab = "builder" | "activity";
@@ -13,8 +14,6 @@ interface WorkflowTopNavProps {
 }
 
 export function WorkflowTopNav({ activeTab, onTabChange }: WorkflowTopNavProps) {
-  const theme = useQueryStore((s) => s.theme);
-  const setTheme = useQueryStore((s) => s.setTheme);
   const pushHistory = useQueryStore((s) => s.pushHistory);
   const exportJson = useQueryStore((s) => s.exportJson);
   const importJson = useQueryStore((s) => s.importJson);
@@ -22,11 +21,6 @@ export function WorkflowTopNav({ activeTab, onTabChange }: WorkflowTopNavProps) 
 
   const fileRef = useRef<HTMLInputElement>(null);
   const [importError, setImportError] = useState<string | null>(null);
-
-  const cycleTheme = useCallback(() => {
-    const order: Array<"light" | "dark" | "system"> = ["light", "dark", "system"];
-    setTheme(order[(order.indexOf(theme) + 1) % order.length]);
-  }, [theme, setTheme]);
 
   const handleExport = () => {
     const blob = new Blob([exportJson()], { type: "application/json" });
@@ -39,12 +33,12 @@ export function WorkflowTopNav({ activeTab, onTabChange }: WorkflowTopNavProps) 
   };
 
   return (
-    <header className="lantern-nav sticky top-0 z-30 shrink-0">
+    <header className="lantern-nav sticky top-0 z-30 shrink-0 border-b border-[var(--border)] bg-[var(--bg-card)] shadow-sm">
       <div className="flex h-14 items-center gap-4 px-4 lg:px-6">
         <LanternLogo size="sm" />
 
         <nav
-          className="absolute left-1/2 flex -translate-x-1/2 gap-1"
+          className="absolute left-1/2 flex -translate-x-1/2 gap-1 rounded-lg bg-[var(--bg-muted)]/50 p-1"
           aria-label="Main sections"
         >
           {(
@@ -56,7 +50,7 @@ export function WorkflowTopNav({ activeTab, onTabChange }: WorkflowTopNavProps) 
             <button
               key={tab.id}
               type="button"
-              className="lantern-nav-tab"
+              className="lantern-nav-tab rounded-md px-4 py-1.5 text-sm font-medium transition-colors data-[active=true]:bg-[var(--bg-card)] data-[active=true]:font-semibold data-[active=true]:text-[var(--fg)] data-[active=true]:shadow-sm"
               data-active={activeTab === tab.id}
               onClick={() => onTabChange(tab.id)}
             >
@@ -118,15 +112,7 @@ export function WorkflowTopNav({ activeTab, onTabChange }: WorkflowTopNavProps) 
               e.target.value = "";
             }}
           />
-          <motion.button
-            whileTap={{ scale: 0.97 }}
-            type="button"
-            onClick={cycleTheme}
-            className="lantern-btn-secondary flex h-8 w-8 items-center justify-center rounded-lg text-sm"
-            title="Toggle theme"
-          >
-            {theme === "dark" ? "◐" : "○"}
-          </motion.button>
+          <ThemeToggle />
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}

@@ -54,7 +54,7 @@ export function QueryDetailsPanel() {
         </p>
       </div>
 
-      <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-muted)]/50 p-1">
+      <div className="divide-y divide-[var(--border-soft)] rounded-xl border border-[var(--border)] bg-[var(--bg-muted)]/50 px-4">
         <DetailRow
           label="Status"
           value={
