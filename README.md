@@ -13,7 +13,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000) for the landing page, or go directly to the [builder](http://localhost:3000/builder) or [documentation](http://localhost:3000/docs).
 
 ```bash
 npm run test    # Vitest unit & component tests
@@ -60,7 +60,7 @@ npm run build   # Production build
 ```
 
 ### Recursive rendering strategy
-
+vid
 The query tree is a **discriminated union** (`QueryRule | QueryGroup`). `ConditionGroup` renders itself recursively for each child group while `RuleRow` handles leaf nodes. Each node is keyed by stable `id` (nanoid) to minimize reconciliation churn. Groups own a local `@dnd-kit` context for sortable children only (isolated DnD scope per group).
 
 ### State management

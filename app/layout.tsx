@@ -16,7 +16,10 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Lantern — Visual Query Builder",
+  title: {
+    default: "Lantern — Visual Query Builder",
+    template: "%s | Lantern",
+  },
   description:
     "Build complex database queries visually with nested logic, live preview, and simulated execution.",
 };
