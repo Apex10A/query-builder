@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { LanternLogo } from "@/components/brand/lantern-logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useQueryStore } from "@/lib/store/query-store";
+import { useToastStore } from "@/lib/store/toast-store";
 
 export type MainTab = "builder" | "activity";
 
@@ -18,6 +19,7 @@ export function WorkflowTopNav({ activeTab, onTabChange }: WorkflowTopNavProps) 
   const exportJson = useQueryStore((s) => s.exportJson);
   const importJson = useQueryStore((s) => s.importJson);
   const history = useQueryStore((s) => s.history);
+  const addToast = useToastStore((s) => s.addToast);
 
   const fileRef = useRef<HTMLInputElement>(null);
   const [importError, setImportError] = useState<string | null>(null);
@@ -30,6 +32,23 @@ export function WorkflowTopNav({ activeTab, onTabChange }: WorkflowTopNavProps) 
     a.download = `lantern-query-${Date.now()}.json`;
     a.click();
     URL.revokeObjectURL(url);
+    addToast("Query exported to file", "success");
+  };
+
+  const handleShare = async () => {
+    const json = exportJson();
+    try {
+      await navigator.clipboard.writeText(json);
+      addToast("Query copied to clipboard", "success");
+    } catch {
+      handleExport();
+      addToast("Clipboard unavailable — file downloaded instead", "info");
+    }
+  };
+
+  const handleSave = () => {
+    pushHistory();
+    addToast("Snapshot saved", "success");
   };
 
   return (
@@ -37,27 +56,27 @@ export function WorkflowTopNav({ activeTab, onTabChange }: WorkflowTopNavProps) 
       <div className="flex h-14 items-center gap-4 px-4 lg:px-6">
         <LanternLogo size="sm" href="/" />
 
-        <nav
-          className="absolute left-1/2 flex -translate-x-1/2 gap-1"
-          aria-label="Main sections"
-        >
-          {(
-            [
-              { id: "builder" as const, label: "Builder" },
-              { id: "activity" as const, label: "Activity" },
-            ] as const
-          ).map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              className="lantern-nav-tab"
-              data-active={activeTab === tab.id}
-              onClick={() => onTabChange(tab.id)}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </nav>
+          <nav
+            className="absolute left-1/2 flex -translate-x-1/2 gap-1 rounded-lg bg-[var(--bg-muted)]/50 p-1"
+            aria-label="Main sections"
+          >
+            {(
+              [
+                { id: "builder" as const, label: "Builder" },
+                { id: "activity" as const, label: "Activity" },
+              ] as const
+            ).map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                className="lantern-nav-tab cursor-pointer rounded-md px-4 py-1.5 text-sm font-medium transition-colors data-[active=true]:bg-[var(--bg-card)] data-[active=true]:font-semibold data-[active=true]:text-[var(--fg)] data-[active=true]:shadow-sm"
+                data-active={activeTab === tab.id}
+                onClick={() => onTabChange(tab.id)}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </nav>
 
         <div className="ml-auto flex items-center gap-2">
           {history.length > 0 && (

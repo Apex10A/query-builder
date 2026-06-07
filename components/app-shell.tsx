@@ -8,6 +8,7 @@ import { WorkflowSidebar } from "@/components/layout/workflow-sidebar";
 import { ActivityPanel } from "@/components/layout/activity-panel";
 import { QueryBuilderPanel } from "@/components/query-builder/query-builder-panel";
 import { useQueryStore } from "@/lib/store/query-store";
+import { ToastContainer } from "@/components/ui/toast-container";
 
 export function AppShell() {
   useKeyboardShortcuts();
@@ -15,11 +16,11 @@ export function AppShell() {
   const lastResultCount = useQueryStore((s) => s.lastResultCount);
 
   return (
-    <div className="lantern-app flex h-dvh flex-col overflow-hidden">
+    <div className="lantern-app flex h-dvh flex-col overflow-hidden bg-[var(--bg-app)]">
       <WorkflowTopNav activeTab={mainTab} onTabChange={setMainTab} />
 
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
-        <main className="lantern-canvas min-h-0 min-w-0 flex-1 overflow-y-auto">
+        <main className="lantern-canvas min-h-0 min-w-0 flex-1 overflow-y-auto bg-[var(--bg-canvas)] bg-[radial-gradient(circle,var(--border)_1px,transparent_1px)] bg-[length:20px_20px]">
           <AnimatePresence mode="wait">
             {mainTab === "builder" ? (
               <motion.div
@@ -40,7 +41,9 @@ export function AppShell() {
                 exit={{ opacity: 0 }}
                 className="p-6 lg:p-10"
               >
-                <ActivityPanel />
+                <ActivityPanel
+                  onRestored={() => setMainTab("builder")}
+                />
               </motion.div>
             )}
           </AnimatePresence>
@@ -48,6 +51,7 @@ export function AppShell() {
 
         <WorkflowSidebar resultsCount={lastResultCount} />
       </div>
+      <ToastContainer />
     </div>
   );
 }
